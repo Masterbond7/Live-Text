@@ -22,7 +22,8 @@ int main() {
 	}
 
 	// Add an inotify watch
-	int wd = inotify_add_watch(fd, "/home/james/Desktop/", IN_ACCESS | IN_CLOSE_WRITE | IN_CLOSE_NOWRITE | IN_CREATE | IN_DELETE | IN_MODIFY | IN_OPEN); // Watch descriptor
+	int wd = inotify_add_watch(fd, "/home/james/Desktop/", IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO); // Watch descriptor 
+    //(may need to add IN_CLOSE_WRITE)
 	if (wd == -1) {
 		printf("%s Inotify watch start error\nErrno %i, (%s)\n", TEMPLATE_ERROR, errno, strerror(errno));
 		return errno;
