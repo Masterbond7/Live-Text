@@ -32,12 +32,19 @@ int main() {
 
 	// Read events from file descriptor
 	char buf[4096];
-	if (read(fd, buf, sizeof(buf)) == -1) {
+	ssize_t len = read(fd, buf, sizeof(buf));
+	const struct inotify_event *event;
+	if (len == -1) {
 		printf("%s Inotify read\nErrno %i, (%s)\n", TEMPLATE_ERROR, errno, strerror(errno));
 	} else {
 		printf("File event detected\n");
 	}
 
+	// Interpret events from buffer
+	for (char *ptr = buf; ptr < buf + len; ptr += sizeof(struct inotify_event) + event->len) {
+		event = (const struct inotify_event *) ptr;
+		cout << event->mask << endl;
+	}
 
 	// Exiting the program successfully
 	return 0;
