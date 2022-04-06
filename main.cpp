@@ -2,6 +2,7 @@
 #include <iostream>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 // Including inotify files
 #include <sys/inotify.h>
@@ -28,6 +29,15 @@ int main() {
 		printf("%s Inotify watch start error\nErrno %i, (%s)\n", TEMPLATE_ERROR, errno, strerror(errno));
 		return errno;
 	}
+
+	// Read events from file descriptor
+	char buf[4096];
+	if (read(fd, buf, sizeof(buf)) == -1) {
+		printf("%s Inotify read\nErrno %i, (%s)\n", TEMPLATE_ERROR, errno, strerror(errno));
+	} else {
+		printf("File event detected\n");
+	}
+
 
 	// Exiting the program successfully
 	return 0;
