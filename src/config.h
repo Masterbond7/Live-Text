@@ -1,0 +1,1 @@
+const char HELP_TEXT[] = "Usage: ./main.o <project folder path> <target ip>";
