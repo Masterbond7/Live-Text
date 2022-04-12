@@ -12,7 +12,8 @@ char* target_ip;
 int main(int argc, char **argv) {
     // Parse inputs
     for (int i = 1; i < argc; i++) {
-        if (std::string(argv[i]) == "-h") { printf("%s\n", config_header::HELP_TEXT); return 1; }
+        if (std::string(argv[i]) == "-h") { printf("%s\n", config_header::HELP_TEXT); return 0; }
+        else { printf("Unknown argument.\n%s\n", config_header::HELP_TEXT); return 1; }
     }
 
     // Exit successfully
