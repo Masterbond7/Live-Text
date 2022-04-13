@@ -23,29 +23,43 @@ int main(int argc, char **argv) {
         else if (std::regex_match(std::string(argv[i]), config_header::REGEX_IP)) {
             // Say IP-like input was detected and check if it is valid (numbers 0-255)
             printf("IP detected (%s); ", argv[i]);
-            if (std::regex_match(std::string(argv[i]), config_header::REGEX_IP_VALID)) {
-                // Set IP if it is valid
-                target_ip = argv[i];
-                printf("IP is valid.\n");
+            // If target_ip was already set exit and inform the user
+            if (target_ip != NULL) {
+                printf("IP was already set (%s); Argument can only be set once.\n", target_ip);
+                return 1;
             }
-            else { printf("IP is invalid.\n"); }
+            else {
+                if (std::regex_match(std::string(argv[i]), config_header::REGEX_IP_VALID)) {
+                    // Set IP if it is valid
+                    target_ip = argv[i];
+                    printf("IP is valid.\n");
+                }
+                else { printf("IP is invalid.\n"); return 1; }
+            }
         }
 
         // Handle path input
         else if (std::regex_match(std::string(argv[i]), config_header::REGEX_PATH)) {
-            // Say a path was detected and check if it is valid
-            printf("Path detected (%s); ", argv[i]);
-            if (std::regex_match(std::string(argv[i]), config_header::REGEX_DIRECTORY)) {
-                if (std::filesystem::is_directory(argv[i])) {
-                    printf("Directory is valid.\n");
-                    target_path = argv[i];
-                }
-                else { printf("Directory is invalid.\n"); return 2; }
+            // If target_path was already set exit and inform the user
+            if (target_path != NULL) {
+                printf("Path was already set (%s); Argument can only be set once.\n", target_path);
+                return 1;
             }
-            // Handle non-directory inputs
             else {
-                printf("File was provided or path root was not specified (first or last '/' may be missing)\n");
-                return 3;
+                // Say a path was detected and check if it is valid
+                printf("Path detected (%s); ", argv[i]);
+                if (std::regex_match(std::string(argv[i]), config_header::REGEX_DIRECTORY)) {
+                    if (std::filesystem::is_directory(argv[i])) {
+                        printf("Directory is valid.\n");
+                        target_path = argv[i];
+                    }
+                    else { printf("Directory is invalid.\n"); return 2; }
+                }
+                // Handle non-directory inputs
+                else {
+                    printf("File was provided or path root was not specified (first or last '/' may be missing)\n");
+                    return 3;
+                }
             }
         }
 
