@@ -1,2 +1,4 @@
 Exit code 0: Program ran successfully
 Exit code 1: Unknown argument
+Exit code 2: Directory is invalid.
+Exit code 3: File was provided / path root was not specified
