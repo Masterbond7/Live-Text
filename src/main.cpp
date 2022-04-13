@@ -5,8 +5,8 @@
 #include "config.hpp" 
 
 // Defining variables
-char* target_path;
-char* target_ip;
+char* target_path = NULL;
+char* target_ip = NULL;
 
 // Main function
 int main(int argc, char **argv) {
@@ -38,12 +38,13 @@ int main(int argc, char **argv) {
             if (std::regex_match(std::string(argv[i]), config_header::REGEX_DIRECTORY)) {
                 if (std::filesystem::is_directory(argv[i])) {
                     printf("Directory is valid.\n");
+                    target_path = argv[i];
                 }
                 else { printf("Directory is invalid.\n"); return 2; }
             }
             // Handle non-directory inputs
             else {
-                printf("File was provided / path root was not specified.\n", argv[i]);
+                printf("File was provided or path root was not specified (first or last '/' may be missing)\n");
                 return 3;
             }
         }
@@ -53,6 +54,16 @@ int main(int argc, char **argv) {
             printf("Unknown argument. (%s)\n%s\n", argv[i], config_header::HELP_TEXT); 
             return 1;
         }
+    }
+
+    // Handle situation if required arguments are not given
+    if (target_path == NULL || target_ip == NULL) {
+        printf("Required arguments not given; ");
+        if (target_path == NULL) { printf("Path uninitialized. "); }
+        if (target_ip == NULL) { printf("IP uninitialized. "); }
+        printf("\n");
+        
+        return 4;
     }
 
     // Exit successfully
