@@ -17,7 +17,10 @@ int main(int argc, char **argv) {
         }
         else if (std::regex_match(std::string(argv[i]), config_header::REGEX_IP)) {
             printf("IP detected (%s); ", argv[i]);
-            if (std::regex_match(std::string(argv[i]), config_header::REGEX_IP_VALID)) { printf("IP is valid.\n"); }
+            if (std::regex_match(std::string(argv[i]), config_header::REGEX_IP_VALID)) {
+                target_ip = argv[i];
+                printf("IP is valid.\n");
+            }
             else { printf("IP is invalid.\n"); }
         }
         else {
