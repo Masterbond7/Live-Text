@@ -103,6 +103,9 @@ int main(int argc, char **argv) {
             running = false;
             return exit_code;
         }
+    
+        // Delay to not max out cpu core
+        usleep(1000);
     }
 
     // Exit successfully
@@ -165,5 +168,8 @@ void fs_updates() {
 				else if (event->mask & IN_MOVED_TO) { printf("IN_MOVED_TO: %s %i\n", event->name, event->cookie); }
 			}
 		}
+
+        // Delay to not max out cpu core
+        usleep(1000);
 	}
 }
