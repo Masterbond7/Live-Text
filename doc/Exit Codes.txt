@@ -3,3 +3,7 @@ Exit code 1: Unknown/Invalid argument.
 Exit code 2: Directory is invalid.
 Exit code 3: File was provided or path root was not specified (first or last '/' may be missing)
 Exit code 4: Required arguments not given.
+Exit code 5: Inotify initialization error.
+Exit code 6: Error adding inotify watch.
+Exit code 7: Error while polling for number of available bytes
+Exit code 8: Error reading events from inotify file descriptor

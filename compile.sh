@@ -1,1 +1,1 @@
-g++ ./src/main.cpp -o ./bin/main.o -std=c++17
+g++ ./src/main.cpp -o ./bin/main.o -std=c++17 -pthread
