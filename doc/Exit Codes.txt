@@ -5,5 +5,6 @@ Exit code 3: File was provided or path root was not specified (first or last '/'
 Exit code 4: Required arguments not given.
 Exit code 5: Inotify initialization error.
 Exit code 6: Error adding inotify watch.
-Exit code 7: Error while polling for number of available bytes
-Exit code 8: Error reading events from inotify file descriptor
+Exit code 7: Error while polling for number of available bytes.
+Exit code 8: Error reading events from inotify file descriptor.
+Exit code 9: Program was inturrupted and has shutdown successfully.

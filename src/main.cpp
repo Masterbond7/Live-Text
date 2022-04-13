@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <sys/inotify.h>
 #include <future>
+#include <signal.h>
 
 #include "config.hpp" 
 
@@ -19,10 +20,14 @@ char* target_path = NULL;
 char* target_ip = NULL;
 
 // Declaring functions
+void sigint_handler(int sig_num);
 void fs_updates();
 
 // Main function
 int main(int argc, char **argv) {
+    // Set signal handler for SIGINT
+    signal(SIGINT, sigint_handler);
+
 	// Parse inputs
 	for (int i = 1; i < argc; i++) {
 		// Handle -h (help) argument
@@ -112,6 +117,15 @@ int main(int argc, char **argv) {
 	return exit_code;
 }
 
+// Function to catch and handle SIGINT signal (Ctrl+C)
+void sigint_handler(int sig_num) {
+    // Clean up and exit
+    running = false;
+
+    printf("Quit successfully.\n");
+    exit(9);
+}
+
 // Function to catch and handle file system updates
 void fs_updates() {
 	// Start an inotify instance
@@ -139,7 +153,7 @@ void fs_updates() {
 
 	// Read events from file descriptor
 	printf("Reading events\n");
-	while (true) {
+	while (running) {
 		// If an event is available, read and interpret the event
 		if (poll(fds, nfds, -1)) {
 			// Read the amount of bytes available
