@@ -7,4 +7,4 @@ Exit code 5: Inotify initialization error.
 Exit code 6: Error adding inotify watch.
 Exit code 7: Error while polling for number of available bytes.
 Exit code 8: Error reading events from inotify file descriptor.
-Exit code 9: Program was inturrupted and has shutdown successfully.
+Exit code 9: Program was interrupted and has shutdown successfully.
