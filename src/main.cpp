@@ -11,6 +11,7 @@
 #include <future>
 #include <signal.h>
 #include <map>
+#include <vector>
 
 #include "config.hpp" 
 
@@ -19,11 +20,13 @@ int exit_code = 0;
 bool running = true;
 char* target_path = NULL;
 char* target_ip = NULL;
+std::vector<std::string> directories;
 std::map<int, char*> wd_path_map;
 
 // Declaring functions
 void sigint_handler(int sig_num);
 void fs_updates();
+void get_folders(char* path);
 
 // Main function
 int main(int argc, char **argv) {
@@ -138,19 +141,27 @@ void fs_updates() {
 		exit_code = 5;
 	}
 
-	// Add an inotify watch
-	printf("Adding inotify watch\n");
-	int wd = inotify_add_watch(fd, target_path, IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO);
-	if (wd == -1) {
-		printf("%s Inotify watch start error\nErrno %i, (%s)\n", config_header::TEMPLATE_ERROR, errno, strerror(errno));
-		exit_code = 6;
+    // Get all folders in chosen directory recursively (paths stored in directories vector)
+    get_folders(target_path);
+
+	// Add inotify watches
+	printf("Adding inotify watches\n");
+	for (int i = 0; i < directories.size(); i++) {
+		// Adding the watch
+		int wd = inotify_add_watch(fd, directories[i].c_str(), IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO);
+		if (wd == -1) {
+			printf("%s Inotify watch start error\nErrno %i, (%s)\n", config_header::TEMPLATE_ERROR, errno, strerror(errno));
+			exit_code = 6;
+		}
+
+		// Adding watch descriptor to map stating path
+		wd_path_map[wd] = const_cast<char*>(directories[i].c_str());
 	}
 
-    // Adding watch descriptor to map stating path
-    wd_path_map[wd] = target_path;
-    for (auto &item : wd_path_map) {
-        std::cout << item.first << ":" << item.second << "\n";
-    }
+	// Print list of watch descriptors and paths
+	for (auto &item : wd_path_map) {
+		std::cout << item.first << ":" << item.second << "\n";
+	}
 
 	// Prepare for polling
 	nfds_t nfds;
@@ -183,15 +194,35 @@ void fs_updates() {
 			const struct inotify_event *event;
 			for (char *ptr = buf; ptr < buf + len; ptr += sizeof(struct inotify_event) + event->len) {
 				event = (const struct inotify_event *) ptr;
-				if (event->mask & IN_CREATE) { printf("IN_CREATE: %s\n", event->name); }
-				else if (event->mask & IN_DELETE) { printf("IN_DELETE: %s\n", event->name); }
-				else if (event->mask & IN_MODIFY) { printf("IN_MODIFY: %s\n", event->name); }
-				else if (event->mask & IN_MOVED_FROM) { printf("IN_MOVED_FROM: %s, %i\n", event->name, event->cookie); }
-				else if (event->mask & IN_MOVED_TO) { printf("IN_MOVED_TO: %s, %i\n", event->name, event->cookie); }
+				if (event->mask & IN_CREATE) { printf("IN_CREATE: %s, Path: %s%s\n", event->name, wd_path_map[event->wd], event->name); }
+				else if (event->mask & IN_DELETE) { printf("IN_DELETE: %s, Path: %s%s\n", event->name, wd_path_map[event->wd], event->name); }
+				else if (event->mask & IN_MODIFY) { printf("IN_MODIFY: %s, Path: %s%s\n", event->name, wd_path_map[event->wd], event->name); }
+				else if (event->mask & IN_MOVED_FROM) { printf("IN_MOVED_FROM: %s, %i, Path: %s%s\n", event->name, event->cookie, wd_path_map[event->wd], event->name); }
+				else if (event->mask & IN_MOVED_TO) { printf("IN_MOVED_TO: %s, %i, Path: %s%s\n", event->name, event->cookie, wd_path_map[event->wd], event->name); }
 			}
 		}
 
 		// Delay to not max out cpu core
 		usleep(1000);
 	}
+}
+
+// Function to get all folders in a chosen directory
+void get_folders(char* path) {
+    // Count the number of folders
+    int n_directories = 1;
+    for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path)) {
+        if (std::filesystem::is_directory(dir_entry)) { n_directories++; }
+    }
+
+    // Reiterate and store paths in appropriately sized list
+    directories.resize(n_directories);
+	directories[0] = std::string(target_path);
+    int i = 1;
+    for (const std::filesystem::directory_entry& dir_entry : std::filesystem::recursive_directory_iterator(path)) {
+        if (std::filesystem::is_directory(dir_entry)) {
+            directories[i] = std::string(dir_entry.path());
+            i++;
+        }
+    }
 }
