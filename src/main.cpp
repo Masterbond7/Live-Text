@@ -179,7 +179,7 @@ void fs_updates() {
 				else if (event->mask & IN_DELETE) { printf("IN_DELETE: %s\n", event->name); }
 				else if (event->mask & IN_MODIFY) { printf("IN_MODIFY: %s\n", event->name); }
 				else if (event->mask & IN_MOVED_FROM) { printf("IN_MOVED_FROM: %s, %i\n", event->name, event->cookie); }
-				else if (event->mask & IN_MOVED_TO) { printf("IN_MOVED_TO: %s %i\n", event->name, event->cookie); }
+				else if (event->mask & IN_MOVED_TO) { printf("IN_MOVED_TO: %s, %i\n", event->name, event->cookie); }
 			}
 		}
 
