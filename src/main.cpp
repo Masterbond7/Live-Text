@@ -10,6 +10,7 @@
 #include <sys/inotify.h>
 #include <future>
 #include <signal.h>
+#include <map>
 
 #include "config.hpp" 
 
@@ -18,6 +19,7 @@ int exit_code = 0;
 bool running = true;
 char* target_path = NULL;
 char* target_ip = NULL;
+std::map<int, char*> wd_path_map;
 
 // Declaring functions
 void sigint_handler(int sig_num);
@@ -143,6 +145,12 @@ void fs_updates() {
 		printf("%s Inotify watch start error\nErrno %i, (%s)\n", config_header::TEMPLATE_ERROR, errno, strerror(errno));
 		exit_code = 6;
 	}
+
+    // Adding watch descriptor to map stating path
+    wd_path_map[wd] = target_path;
+    for (auto &item : wd_path_map) {
+        std::cout << item.first << ":" << item.second << "\n";
+    }
 
 	// Prepare for polling
 	nfds_t nfds;
