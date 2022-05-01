@@ -138,7 +138,7 @@ void fs_updates() {
 	int fd = inotify_init(); // File descriptor
 	if (fd == -1) {
 		printf("%s Inotify initialization error\nErrno %i, (%s)\n", config_header::TEMPLATE_ERROR, errno, strerror(errno));
-		exit_code = 5;
+		exit_code = 5; // Set exit code to 5 to exit the program
 	}
 
     // Get all folders in chosen directory recursively (paths stored in directories vector)
@@ -151,7 +151,7 @@ void fs_updates() {
 		int wd = inotify_add_watch(fd, directories[i].c_str(), IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO);
 		if (wd == -1) {
 			printf("%s Inotify watch start error\nErrno %i, (%s)\n", config_header::TEMPLATE_ERROR, errno, strerror(errno));
-			exit_code = 6;
+			exit_code = 6; // Set exit code to 6 to exit the program
 		}
 
 		// Adding watch descriptor to map stating path
@@ -179,7 +179,7 @@ void fs_updates() {
 			int bytes_available;
 			if (ioctl(fd, FIONREAD, &bytes_available) == -1) {
 				printf("%s Polling bytes available\nErrno %i, (%s)\n", config_header::TEMPLATE_ERROR, errno, strerror(errno));
-				exit_code = 7;
+				exit_code = 7; // Set exit code to 7 to exit the program
 			}
 
 			// Make the buffer only as large as it needs to be
@@ -187,7 +187,7 @@ void fs_updates() {
 			ssize_t len = read(fd, buf, sizeof(buf));
 			if (len == -1) {
 				printf("%s Inotify read\nErrno %i, (%s)\n", config_header::TEMPLATE_ERROR, errno, strerror(errno));
-				exit_code = 8;
+				exit_code = 8; // Set exit code to 8 to exit the program
 			}
 
 			// Interpret events from buffer
